@@ -4,7 +4,8 @@ SRC = srcs/philosophers.c \
 			srcs/input_parsing.c \
 			srcs/time_handler.c \
 			srcs/threads.c \
-			srcs/routine.c
+			srcs/routine.c \
+			srcs/clean_memory.c
 
 OBJS = $(SRC:.c=.o)
 # BONUS_OBJS = $(BONUS_SRC:.c=.o)
@@ -32,8 +33,7 @@ all: $(NAME)
 
 # Pulizia degli oggetti
 clean:
-	@$(RM) $(OBJS)  
-	@$(MAKE) --no-print-directory
+	@$(RM) $(OBJS)
 
 # Pulizia completa
 fclean: clean
