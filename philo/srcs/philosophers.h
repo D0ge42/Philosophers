@@ -45,7 +45,7 @@ int philosopher_take_forks(t_philo *philo);
 void philosopher_eat(t_philo *philo);
 void philosopher_sleep(t_philo *philo);
 void philosopher_think(t_philo *philo);
-int custom_sleep(time_t time_to_sleep);
+int custom_sleep(time_t time_to_sleep,t_philo *philo);
 void check_death(time_t last_meal_time,t_philo *philos);
 void assign_mutex_and_forks(t_philo *philo, pthread_mutex_t *mutex, int *forks, int philos_num);
 int is_input_valid(int ac, char **av);
