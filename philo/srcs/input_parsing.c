@@ -1,5 +1,4 @@
 #include "philosophers.h"
-#include <stdlib.h>
 
 /*Standard atoi*/
 
@@ -51,7 +50,7 @@ int is_input_valid(int ac, char **av)
       return 0;
     i++;
   }
-  if (av[ac - 1] < 0)
+  if (ft_atoi(av[ac - 1]) < 0)
     return 0;
   return 1;
 }

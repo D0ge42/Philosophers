@@ -14,20 +14,21 @@ void assign_mutex_and_forks(t_philo *philo, pthread_mutex_t *mutex, int *forks, 
 
 void check_death(time_t last_meal_time, t_philo *philos)
 {
-
-  // printf("last_meal_time of philospher[%i] = %li\n",philos->id,last_meal_time);
-  time_t current_time = time_to_ms();
-  // printf("current_time = %li\n",current_time);
-  time_t time_since_last_meal = current_time - last_meal_time;
-  // printf("Time_since_last_meal of philo[%i] = %li\n",philos->id,current_time - last_meal_time);
-  
-  if (time_since_last_meal > 0)
+  pthread_mutex_lock(philos->death_mutex);
+  // Relative current time is given by current_time  - start time(time at which philo was created).
+  time_t relative_current_time = (time_to_ms() - philos->start_time);
+  // Relative meal time is the last_meal_time - philos_start time. 
+  time_t relative_last_meal_time = (last_meal_time - philos->start_time);
+  // THe same since last meal will be given my relative current time - relative_last_meal time.
+  time_t time_since_last_meal  = relative_current_time - relative_last_meal_time;
+  if (time_since_last_meal >= philos->time_to_die)
   {
-    philos->table->death_flag = 1; 
-    printf("Philosopher[%i] has died\n", philos->id);
-  }
-}
 
+    printf("%li Philo[%i] has died\n",time_to_ms(),philos->id);
+    philos->table->death_flag = 1;
+  }
+  pthread_mutex_unlock(philos->death_mutex);
+}
 
 /*While loop to create threads for each philosopher and join them.*/
 

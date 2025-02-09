@@ -1,6 +1,5 @@
 #include "philosophers.h"
 #include <pthread.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 /*Function will take start time and check when its time to stop sleeping*/
@@ -10,8 +9,8 @@ void *routine(void *pointer)
   t_philo *philo = (t_philo *)pointer;
   while(philo->table->death_flag == 0)
   {
-    philosopher_take_forks(philo);
-    philosopher_think(philo);
+    if (!philosopher_take_forks(philo))
+      philosopher_think(philo);
   }
   return 0;
 }
@@ -20,13 +19,21 @@ void *routine(void *pointer)
  * That means that we'll use a mutex to check and set the forks
  * for the philosophers.
  * Once forks are set we'll decide if we can eat or not.*/
-
-void philosopher_take_forks(t_philo *philo)
+int philosopher_take_forks(t_philo *philo)
 {
   int both_forks_available = 0;
-
-  pthread_mutex_lock(philo->left_mutex);
-  pthread_mutex_lock(philo->right_mutex);
+  check_death(philo->last_meal, philo);
+  // Evitiamo deadlock: i filosofi pari prendono prima la destra, i dispari la sinistra
+  if (philo->id % 2 == 0)
+  {
+    pthread_mutex_lock(philo->right_mutex);
+    pthread_mutex_lock(philo->left_mutex);
+  }
+  else
+  {
+    pthread_mutex_lock(philo->left_mutex);
+    pthread_mutex_lock(philo->right_mutex);
+  }
 
   if (philo->left_fork[0] == 0 && philo->right_fork[0] == 0)
   {
@@ -39,17 +46,30 @@ void philosopher_take_forks(t_philo *philo)
   
   if (both_forks_available)
   {
-    printf("Philo takes right fork\n");
-    printf("Philo takes left fork\n");
+    printf("Philo %i takes right fork\n",philo->id);
+    printf("Philo %i takes left fork\n",philo->id);
+
     philosopher_eat(philo);
-    pthread_mutex_lock(philo->left_mutex);
-    pthread_mutex_lock(philo->right_mutex);
+
+    if(philo->id %2 == 0)
+    {
+      pthread_mutex_lock(philo->right_mutex);
+      pthread_mutex_lock(philo->left_mutex);
+    }
+    else
+    {
+      pthread_mutex_lock(philo->left_mutex);
+      pthread_mutex_lock(philo->right_mutex);
+    }
     philo->left_fork[0] = 0;
     philo->right_fork[0] = 0;
     pthread_mutex_unlock(philo->left_mutex);
     pthread_mutex_unlock(philo->right_mutex);
+    
     philosopher_sleep(philo);
+    return 1;
   }
+  return 0;
   // Fork checks
 }
 
@@ -57,9 +77,9 @@ void philosopher_take_forks(t_philo *philo)
  * which then will be passed to the check death function.*/
 void philosopher_eat(t_philo *philo)
 {
-  philo->last_meal = time_to_ms();
   printf("%i is eating\n",philo->id);
-  custom_sleep(philo->table->time_to_eat);
+  custom_sleep(philo->time_to_eat);
+  philo->last_meal = time_to_ms();
 }
 
 /*Philosopher will sleep for an amount of time after eating.*/
@@ -68,7 +88,7 @@ void philosopher_sleep(t_philo *philo)
 {
   check_death(philo->last_meal, philo);
   printf("%i is sleeping\n",philo->id);
-  custom_sleep(philo->table->time_to_sleep);
+  custom_sleep(philo->time_to_sleep);
 }
 
 /*Philosopher will think and print a message. This time we will protect
@@ -90,7 +110,7 @@ void philosopher_think(t_philo *philo)
 int custom_sleep(time_t time_to_sleep)
 {
   time_t start = time_to_ms();
-  while((time_to_ms() - start) > time_to_sleep)
+  while((time_to_ms() - start) < time_to_sleep)
     usleep(200);
   return 0;
 }

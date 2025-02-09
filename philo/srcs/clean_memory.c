@@ -2,7 +2,6 @@
 #include <bits/pthreadtypes.h>
 #include <bits/types/struct_timeval.h>
 #include <pthread.h>
-#include <string.h>
 #include <sys/time.h>
 
 

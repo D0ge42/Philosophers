@@ -41,8 +41,8 @@ t_table *create_table(char **av)
   table->forks = malloc(sizeof(int) * table->num_of_philos);
   if (!table->forks)
   {
-    free(table);
     free(table->mutexes);
+    free(table);
     return NULL;
   }
   memset(table->forks,0,sizeof(int) * table->num_of_philos);
@@ -54,6 +54,17 @@ void free_previous_philos(t_philo **philos, int i)
   while(i)
   {
     free(philos[i]);
+    i--;
+  }
+  free(philos);
+  return;
+}
+
+void free_previous_mutexes(t_philo **philos, int i)
+{
+  while(i)
+  {
+    free(philos[i]->death_mutex);
     i--;
   }
   free(philos);
@@ -77,6 +88,12 @@ t_philo **create_philos(char **av)
       return 0;
     }
     memset(philos[i],0,sizeof(t_philo));
+    philos[i]->death_mutex = malloc(sizeof(pthread_mutex_t));
+    if (!philos[i]->death_mutex)
+    {
+      free_previous_mutexes(philos, i);
+      return 0;
+    }
     i++;
   }
   return philos;
@@ -104,9 +121,9 @@ int main(int ac, char **av)
   philos = create_philos(av);
   table = create_table(av);
   assign_and_initialize(philos,table,av);
+  clean_table(table);
   create_threads(philos,table);
-  // clean_table(table);
-  // clean_philos(philos, av);
+  clean_philos(philos, av);
 }
 
 /*Function used to initialize allocated values. I'll probably use memset later on*/
@@ -114,9 +131,13 @@ int main(int ac, char **av)
 void philo_initializer(t_philo **philos,int index, char **av,t_table *table)
 {
   pthread_mutex_init(&table->mutexes[index],NULL);
+  pthread_mutex_init(philos[index]->death_mutex,NULL);
+  philos[index]->start_time = time_to_ms();
   philos[index]->table = table;
   philos[index]->id = index + 1;
-  table->time_to_die = ft_atoi(av[2]);
-  table->time_to_eat = ft_atoi(av[3]);
-  table->time_to_sleep = ft_atoi(av[4]);
+  philos[index]->meals_eaten = 0;
+  philos[index]->last_meal = time_to_ms();
+  philos[index]->time_to_die = ft_atoi(av[2]);
+  philos[index]->time_to_eat = ft_atoi(av[3]);
+  philos[index]->time_to_sleep = ft_atoi(av[4]);
 }
