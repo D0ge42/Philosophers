@@ -20,6 +20,7 @@ void clean_table(t_table *table)
     i++;
   }
   free(table->mutexes);
+  free(table->death_mutex);
   free(table);
 }
 

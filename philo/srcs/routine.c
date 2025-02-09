@@ -7,10 +7,15 @@
 void *routine(void *pointer)
 {
   t_philo *philo = (t_philo *)pointer;
+  // printf("%i\n",philo->id);
   while(philo->table->death_flag == 0)
   {
+    // printf("DEATH FLAG  = %i\n",philo->table->death_flag);
+    check_death(philo->last_meal, philo);
     if (!philosopher_take_forks(philo))
-      philosopher_think(philo);
+        philosopher_think(philo);
+    else
+      philo->is_thinking = 0;
   }
   return 0;
 }
@@ -22,7 +27,6 @@ void *routine(void *pointer)
 int philosopher_take_forks(t_philo *philo)
 {
   int both_forks_available = 0;
-  check_death(philo->last_meal, philo);
   // Evitiamo deadlock: i filosofi pari prendono prima la destra, i dispari la sinistra
   if (philo->id % 2 == 0)
   {
@@ -46,9 +50,11 @@ int philosopher_take_forks(t_philo *philo)
   
   if (both_forks_available)
   {
-    printf("Philo %i takes right fork\n",philo->id);
-    printf("Philo %i takes left fork\n",philo->id);
-
+    if (philo->table->death_flag == 0)
+    {
+      printf("%li  %i has taken a fork\n",time_to_ms(),philo->id);
+      printf("%li  %i has taken a fork\n",time_to_ms(),philo->id);
+    }
     philosopher_eat(philo);
 
     if(philo->id %2 == 0)
@@ -77,18 +83,23 @@ int philosopher_take_forks(t_philo *philo)
  * which then will be passed to the check death function.*/
 void philosopher_eat(t_philo *philo)
 {
-  printf("%i is eating\n",philo->id);
-  custom_sleep(philo->time_to_eat);
   philo->last_meal = time_to_ms();
+  if (philo->table->death_flag == 0)
+  {
+    printf("%li %i is eating\n",time_to_ms(),philo->id);
+    custom_sleep(philo->time_to_eat);
+  }
 }
 
 /*Philosopher will sleep for an amount of time after eating.*/
 
 void philosopher_sleep(t_philo *philo)
 {
-  check_death(philo->last_meal, philo);
-  printf("%i is sleeping\n",philo->id);
-  custom_sleep(philo->time_to_sleep);
+  if (philo->table->death_flag == 0)
+  {
+    printf("%li %i is sleeping\n",time_to_ms(),philo->id);
+    custom_sleep(philo->time_to_sleep);
+  }
 }
 
 /*Philosopher will think and print a message. This time we will protect
@@ -97,11 +108,14 @@ void philosopher_sleep(t_philo *philo)
 
 void philosopher_think(t_philo *philo)
 {
-
-  check_death(philo->last_meal,philo);
-  // pthread_mutex_lock(philo->mutex);
-  printf("%i is thinking\n",philo->id);
-  // pthread_mutex_unlock(philo->mutex);
+  if (philo->table->death_flag == 0)
+  {
+    if (philo->is_thinking == 0)
+    {
+      printf("%li %i is thinking\n",time_to_ms(),philo->id);
+      philo->is_thinking = 1;
+    }
+  }
 }
 
 /*Custom time to sleep function. This is useful to let the philosophers
