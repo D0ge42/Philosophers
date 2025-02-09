@@ -32,7 +32,7 @@ void check_death(time_t last_meal_time, t_philo *philos)
   }
   pthread_mutex_unlock(philos->table->death_mutex);
   if (should_print)
-    printf("%li Philo[%i] has died\n",time_to_ms(),philos->id);
+    printf("%li Philo[%i] has died\n",time_to_ms() - philos->start_time,philos->id);
 }
 
 /*While loop to create threads for each philosopher and join them.*/
