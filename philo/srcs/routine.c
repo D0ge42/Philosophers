@@ -3,28 +3,32 @@
 #include <unistd.h>
 
 /*Function will take start time and check when its time to stop sleeping*/
-int safe_print(t_philo *philo, char *to_print);
+int		safe_print(t_philo *philo, char *to_print);
 
-void *routine(void *pointer)
+void	*routine(void *pointer)
 {
-  t_philo *philo = (t_philo *)pointer;
-  // printf("%i\n",philo->id);
-  if (philo->table->num_of_philos == 1)
-  {
-    printf("%li %i has taken a fork\n", time_to_ms() - philo->start_time, philo->id);
-    usleep(philo->time_to_die * 1000); // Aspetta fino alla morte
-    printf("%li %i has died\n", time_to_ms() - philo->start_time, philo->id);
-    return NULL;
-  }
-  while(!philo->table->death_flag)
-  {
-    check_death(philo->last_meal, philo);
-    if (!philosopher_take_forks(philo))
-        philosopher_think(philo);
-    else
-      philo->is_thinking = 0;
-  }
-  return 0;
+	t_philo	*philo;
+
+	philo = (t_philo *)pointer;
+	// printf("%i\n",philo->id);
+	if (philo->table->num_of_philos == 1)
+	{
+		printf("%li %i has taken a fork\n", time_to_ms() - philo->start_time,
+			philo->id);
+		usleep(philo->time_to_die * 1000); // Aspetta fino alla morte
+		printf("%li %i has died\n", time_to_ms() - philo->start_time,
+			philo->id);
+		return (NULL);
+	}
+	while (!philo->table->death_flag)
+	{
+		check_death(philo->last_meal, philo);
+		if (!philosopher_take_forks(philo))
+			philosopher_think(philo);
+		else
+			philo->is_thinking = 0;
+	}
+	return (0);
 }
 
 /*With this function we'll make a mutex protected check.
@@ -34,164 +38,147 @@ void *routine(void *pointer)
 
 int philosopher_take_forks(t_philo *philo)
 {
-  if (philo->id % 2 == 0)
-  {
-    pthread_mutex_lock(philo->right_mutex);
-    pthread_mutex_lock(philo->left_mutex);
-  }
-  else
-  {
-    pthread_mutex_lock(philo->left_mutex);
-    pthread_mutex_lock(philo->right_mutex);
-  }
-
-  if (philo->left_fork[0] == 0 && philo->right_fork[0] == 0)
-  {
-    philo->left_fork[0] = 1;
-    philo->right_fork[0] = 1;
-   pthread_mutex_unlock(philo->left_mutex);
-      pthread_mutex_unlock(philo->right_mutex);
-    if (safe_print(philo, "has taken a fork") && safe_print(philo, "has taken a fork"))
+    if (philo->id % 2 == 0)
     {
-      philosopher_eat(philo);
+        pthread_mutex_lock(philo->right_mutex);
+        if (philo->right_fork[0] != 0)
+        {
+            pthread_mutex_unlock(philo->right_mutex);
+            return (0);
+        }
+        philo->right_fork[0] = 1;
+        pthread_mutex_unlock(philo->right_mutex);
+        
+        pthread_mutex_lock(philo->left_mutex);
+        if (philo->left_fork[0] != 0)
+        {
+            pthread_mutex_lock(philo->right_mutex);
+            philo->right_fork[0] = 0;
+            pthread_mutex_unlock(philo->right_mutex);
+            pthread_mutex_unlock(philo->left_mutex);
+            return (0);
+        }
+        philo->left_fork[0] = 1;
+        pthread_mutex_unlock(philo->left_mutex);
+    }
+    else
+    {
+        pthread_mutex_lock(philo->left_mutex);
+        if (philo->left_fork[0] != 0)
+        {
+            pthread_mutex_unlock(philo->left_mutex);
+            return (0);
+        }
+        philo->left_fork[0] = 1;
+        pthread_mutex_unlock(philo->left_mutex);
+        
+        pthread_mutex_lock(philo->right_mutex);
+        if (philo->right_fork[0] != 0)
+        {
+            pthread_mutex_lock(philo->left_mutex);
+            philo->left_fork[0] = 0;
+            pthread_mutex_unlock(philo->left_mutex);
+            pthread_mutex_unlock(philo->right_mutex);
+            return (0);
+        }
+        philo->right_fork[0] = 1;
+        pthread_mutex_unlock(philo->right_mutex);
+    }
+
+    safe_print(philo, "has taken a fork");
+    safe_print(philo, "has taken a fork");
+    philosopher_eat(philo);
+
+    // Release forks
     pthread_mutex_lock(philo->right_mutex);
+    philo->right_fork[0] = 0;
+    pthread_mutex_unlock(philo->right_mutex);
+    
     pthread_mutex_lock(philo->left_mutex);
     philo->left_fork[0] = 0;
-    philo->right_fork[0] = 0;
     pthread_mutex_unlock(philo->left_mutex);
-    pthread_mutex_unlock(philo->right_mutex);
-    }
-      philosopher_sleep(philo);
-      return 1;
-  }
-  pthread_mutex_unlock(philo->right_mutex);
-  pthread_mutex_unlock(philo->left_mutex);
-  return 0;
+
+    philosopher_sleep(philo);
+    return (1);
 }
-// int philosopher_take_forks(t_philo *philo)
-// {
-
-//   int both_forks_available = 0;
-//   if (philo->id % 2 == 0)
-//   {
-//     pthread_mutex_lock(philo->right_mutex);
-//     pthread_mutex_lock(philo->left_mutex);
-//   }
-//   else
-//   {
-//     pthread_mutex_lock(philo->left_mutex);
-//     pthread_mutex_lock(philo->right_mutex);
-//   }
-//   if (philo->left_fork[0] == 0 && philo->right_fork[0] == 0)
-//   {
-//     if (!safe_print(philo, "has taken a fork") && !safe_print(philo, "has taken a fork"))
-//       return 0;
-//     both_forks_available = 1;
-//     philo->left_fork[0] = 1;
-//     philo->right_fork[0] = 1;
-//   }
-//   if (philo->id % 2 == 0)
-//   {
-//     pthread_mutex_unlock(philo->right_mutex);
-//     pthread_mutex_unlock(philo->left_mutex);
-//   }
-//   else
-//   {
-//     pthread_mutex_unlock(philo->left_mutex);
-//     pthread_mutex_unlock(philo->right_mutex);
-//   }
-//   if (both_forks_available)
-//   {
-//     philosopher_eat(philo);
-//     if(philo->id %2 == 0)
-//     {
-//       pthread_mutex_lock(philo->right_mutex);
-//       pthread_mutex_lock(philo->left_mutex);
-//     }
-//     else
-//     {
-//       pthread_mutex_lock(philo->left_mutex);
-//       pthread_mutex_lock(philo->right_mutex);
-//     }
-//     philo->left_fork[0] = 0;
-//     philo->right_fork[0] = 0;
-//     if(philo->id %2 == 0)
-//     {
-//       pthread_mutex_unlock(philo->right_mutex);
-//       pthread_mutex_unlock(philo->left_mutex);
-//     }
-//     else
-//     {
-//       pthread_mutex_unlock(philo->left_mutex);
-//       pthread_mutex_unlock(philo->right_mutex);
-//     }
-//     philosopher_sleep(philo);
-//     return 1;
-//   }
-//   return 0;
-//   // Fork checks
-// }
-
 /*Philosoper eating function. Here we retrieve the philo->last->meal
  * which then will be passed to the check death function.*/
-void philosopher_eat(t_philo *philo)
+void	philosopher_eat(t_philo *philo)
 {
-  if (!safe_print(philo, "is eating"))
-    return;
-  if (custom_sleep(philo->time_to_eat,philo))
-    return;
-
-  philo->last_meal = time_to_ms();
+	philo->last_meal = time_to_ms();
+	if (!safe_print(philo, "is eating"))
+		return ;
+	if (custom_sleep(philo->time_to_eat, philo))
+		return ;
 }
 
 /*Philosopher will sleep for an amount of time after eating.*/
 
-void philosopher_sleep(t_philo *philo)
+void	philosopher_sleep(t_philo *philo)
 {
-  if (!safe_print(philo, "is sleeping"))
-    return;
-  if (custom_sleep(philo->time_to_sleep,philo))
-    return ;
+	if (!safe_print(philo, "is sleeping"))
+		return ;
+	if (custom_sleep(philo->time_to_sleep, philo))
+		return ;
 }
 
 /*Philosopher will think and print a message. This time we will protect
- * the print message with a mutex, since this is gonna be inside the routine loop
+ * the print message with a mutex,
+	since this is gonna be inside the routine loop
  * and accessible by everyone.*/
 
-void philosopher_think(t_philo *philo)
+void	philosopher_think(t_philo *philo)
 {
-  if (philo->is_thinking == 0)
-  {
-    if (!safe_print(philo, "is thinking"))
-      return;
-    philo->is_thinking = 1;
-    custom_sleep(philo->time_to_die - philo->time_to_eat - philo->time_to_sleep,philo);
-  }
+	if (philo->is_thinking == 0)
+	{
+		if (!safe_print(philo, "is thinking"))
+			return ;
+		philo->is_thinking = 1;
+	}
 }
 
 /*Custom time to sleep function. This is useful to let the philosophers
  * sleep for a certain amount of time, specified in the main args.*/
 
-int custom_sleep(time_t time_to_sleep, t_philo *philo)
+int	custom_sleep(time_t time_to_sleep, t_philo *philo)
 {
-    time_t start = time_to_ms() + time_to_sleep;
-    while ((time_to_ms() < start))
-    {
-        check_death(philo->last_meal, philo);
-        usleep(50);
-    }
-    return 0;
+	time_t	start;
+
+	start = time_to_ms() + time_to_sleep;
+	while ((time_to_ms() < start))
+	{
+		check_death(philo->last_meal, philo);
+		usleep(50);
+	}
+	return (0);
 }
 
-int safe_print(t_philo *philo, char *to_print)
+int	safe_print(t_philo *philo, char *to_print)
 {
-  pthread_mutex_lock(philo->table->death_mutex);
-   if (philo->table->death_flag == 0)
-    {
-        printf("%li %i %s\n", time_to_ms() - philo->start_time, philo->id, to_print);
-        pthread_mutex_unlock(philo->table->death_mutex);
-        return 1;
-    }
-    pthread_mutex_unlock(philo->table->death_mutex);
-    return 0;
+	pthread_mutex_lock(philo->table->death_mutex);
+	if (philo->table->death_flag == 0)
+	{
+		if (ft_strcmp(to_print, "is thinking") == 0)
+			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
+				philo->id, CYAN, to_print, RESET);
+		else if (ft_strcmp(to_print, "is eating") == 0)
+			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
+				philo->id, GREEN, to_print, RESET);
+		else if (ft_strcmp(to_print, "is sleeping") == 0)
+			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
+				philo->id, BLUE, to_print, RESET);
+		else if (ft_strcmp(to_print, "has taken a fork") == 0)
+			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
+				philo->id, YELLOW, to_print, RESET);
+		else if (ft_strcmp(to_print, "died") == 0)
+			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
+				philo->id, RED, to_print, RESET);
+		else
+			printf("%li %i %s\n", time_to_ms() - philo->start_time, philo->id,
+				to_print);
+		pthread_mutex_unlock(philo->table->death_mutex);
+		return (1);
+	}
+	pthread_mutex_unlock(philo->table->death_mutex);
+	return (0);
 }

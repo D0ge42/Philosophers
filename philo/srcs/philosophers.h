@@ -1,6 +1,16 @@
 #ifndef PHILOSOPHERS_H
 #define PHILOSOPHERS_H
 
+// Define color codes
+#define RESET   "\x1B[0m"
+#define RED     "\x1B[31m"
+#define GREEN   "\x1B[32m"
+#define YELLOW  "\x1B[33m"
+#define BLUE    "\x1B[34m"
+#define MAGENTA "\x1B[35m"
+#define CYAN    "\x1B[36m"
+#define WHITE   "\x1B[37m"
+
 #define PHILO_MAX 200
 #include <limits.h>
 #include <unistd.h>
@@ -49,6 +59,7 @@ int custom_sleep(time_t time_to_sleep,t_philo *philo);
 void check_death(time_t last_meal_time,t_philo *philos);
 void assign_mutex_and_forks(t_philo *philo, pthread_mutex_t *mutex, int *forks, int philos_num);
 int is_input_valid(int ac, char **av);
+int ft_strcmp(char *s1,char *s2);
 
 int ft_is_digit(char c);
 int is_str_only_digits(char *str);
