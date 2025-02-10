@@ -56,7 +56,7 @@ t_table *create_table(char **av)
   memset(table->forks,0,sizeof(int) * table->num_of_philos);
   return table;
 }
-
+ 
 void free_previous_philos(t_philo **philos, int i)
 {
   while(i)

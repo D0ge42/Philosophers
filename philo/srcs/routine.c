@@ -52,8 +52,16 @@ int philosopher_take_forks(t_philo *philo)
     philo->left_fork[0] = 1;
     philo->right_fork[0] = 1;
   }
-  pthread_mutex_unlock(philo->left_mutex);
-  pthread_mutex_unlock(philo->right_mutex);
+  if (philo->id % 2 == 0)
+  {
+    pthread_mutex_unlock(philo->right_mutex);
+    pthread_mutex_unlock(philo->left_mutex);
+  }
+  else
+  {
+    pthread_mutex_unlock(philo->left_mutex);
+    pthread_mutex_unlock(philo->right_mutex);
+  }
   
   if (both_forks_available)
   {
@@ -97,7 +105,8 @@ void philosopher_eat(t_philo *philo)
   philo->last_meal = time_to_ms();
   if (!safe_print(philo, "is eating"))
     return;
-  custom_sleep(philo->time_to_eat * 1000,philo);
+  if (custom_sleep(philo->time_to_eat,philo))
+    return;
 }
 
 /*Philosopher will sleep for an amount of time after eating.*/
@@ -106,7 +115,8 @@ void philosopher_sleep(t_philo *philo)
 {
   if (!safe_print(philo, "is sleeping"))
     return;
-  custom_sleep(philo->time_to_sleep * 1000,philo);
+  if (custom_sleep(philo->time_to_sleep,philo))
+    return ;
 }
 
 /*Philosopher will think and print a message. This time we will protect
@@ -131,15 +141,16 @@ int custom_sleep(time_t time_to_sleep, t_philo *philo)
     time_t start = time_to_ms();
     while ((time_to_ms() - start) < time_to_sleep)
     {
+        check_death(philo->last_meal, philo);
         // Check death_flag every 200 microseconds
-        pthread_mutex_lock(philo->table->death_mutex);
-        if (philo->table->death_flag)
-        {
-            pthread_mutex_unlock(philo->table->death_mutex);
-            return 1;  // Return 1 to indicate interrupted sleep
-        }
-        pthread_mutex_unlock(philo->table->death_mutex);
-        usleep(100);
+        // pthread_mutex_lock(philo->table->death_mutex);
+        // if (philo->table->death_flag)
+        // {
+        //     pthread_mutex_unlock(philo->table->death_mutex);
+        //     return 1;  // Return 1 to indicate interrupted sleep
+        // }
+        // pthread_mutex_unlock(philo->table->death_mutex);
+        usleep(200);
     }
     return 0;
 }
