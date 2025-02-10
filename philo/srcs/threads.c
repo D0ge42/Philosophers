@@ -19,9 +19,8 @@ void check_death(time_t last_meal_time, t_philo *philos)
     pthread_mutex_lock(philos->table->death_mutex);
     current_time = time_to_ms();
     time_since_last_meal = current_time - last_meal_time;
-    
     should_print = 0;
-    if (time_since_last_meal >= philos->time_to_die && philos->table->death_flag == 0)
+    if (time_since_last_meal > philos->time_to_die && philos->table->death_flag == 0)
     {
         philos->table->death_flag = 1;
         should_print = 1;

@@ -35,102 +35,40 @@ void *routine(void *pointer)
 int philosopher_take_forks(t_philo *philo)
 {
 
-  int left_fork_taken = 0;
-  int right_fork_taken = 0;
+  // int left_fork_taken = 0;
+  // int right_fork_taken = 0;
   int both_forks_available = 0;
-  // // Evitiamo deadlock: i filosofi pari prendono prima la destra, i dispari la sinistra
-  // if (philo->id % 2 == 0)
-  // {
-  //   pthread_mutex_lock(philo->right_mutex);
-  //   pthread_mutex_lock(philo->left_mutex);
-  // }
-  // else
-  // {
-  //   pthread_mutex_lock(philo->left_mutex);
-  //   pthread_mutex_lock(philo->right_mutex);
-  // }
-  // if (philo->left_fork[0] == 0 && philo->right_fork[0] == 0)
-  // {
-  //   both_forks_available = 1;
-  //   philo->left_fork[0] = 1;
-  //   philo->right_fork[0] = 1;
-  // }
-  // if (philo->id % 2 == 0)
-  // {
-  //   pthread_mutex_unlock(philo->right_mutex);
-  //   pthread_mutex_unlock(philo->left_mutex);
-  // }
-  // else
-  // {
-  //   pthread_mutex_unlock(philo->left_mutex);
-  //   pthread_mutex_unlock(philo->right_mutex);
-  // }
-  // //--------------------------------------------------------------//
-  if (philo->id %2 == 0)
+  // Evitiamo deadlock: i filosofi pari prendono prima la destra, i dispari la sinistra
+  if (philo->id % 2 == 0)
   {
-    // Try lock right fork
     pthread_mutex_lock(philo->right_mutex);
-    if (philo->right_fork[0] == 0)
-    {
-      philo->right_fork[0] = 1;
-      right_fork_taken = 1;
-      pthread_mutex_unlock(philo->right_mutex);
-      if (!safe_print(philo, "has taken a fork"))
-        return 0;
-    }
-    else
-      pthread_mutex_unlock(philo->right_mutex);
-    // If right fork is already take we drop left fork.
-    if (philo->left_fork[0] == 1 && right_fork_taken)
-    {
-      philo->right_fork[0] = 1;
-      both_forks_available = 0;
-    }
     pthread_mutex_lock(philo->left_mutex);
-    // If left fork was locked and  right one is free, we lock both.
-    if (philo->left_fork[0] == 0 && right_fork_taken)
-    {
-      philo->left_fork[0] = 1;
-      left_fork_taken = 1;
-      both_forks_available = 1;
-      pthread_mutex_unlock(philo->left_mutex);
-      if (!safe_print(philo, "has taken a fork"))
-        return 0;
-    }
   }
   else
   {
-    // Try lock left fork
     pthread_mutex_lock(philo->left_mutex);
-    if (philo->left_fork[0] == 0)
-    {
-      philo->left_fork[0] = 1;
-      left_fork_taken = 1;
-      pthread_mutex_unlock(philo->left_mutex);
-      if (!safe_print(philo, "has taken a fork"))
-        return 0;
-    }
-    else
-      pthread_mutex_unlock(philo->left_mutex);
-    // If right fork is already take we drop left fork.
-    if (philo->right_fork[0] == 1 && left_fork_taken)
-    {
-      philo->left_fork[0] = 1;
-      both_forks_available = 0;
-    }
-    // If left fork was locked and  right one is free, we lock both.
     pthread_mutex_lock(philo->right_mutex);
-    if (philo->right_fork[0] == 0 && left_fork_taken)
-    {
-      philo->right_fork[0] = 1;
-      right_fork_taken = 1;
-      both_forks_available = 1;
-      pthread_mutex_unlock(philo->right_mutex);
-      if (!safe_print(philo, "has taken a fork"))
-        return 0;
-    }
   }
-  if (both_forks_available)
+  if (philo->left_fork[0] == 0 && philo->right_fork[0] == 0)
+  {
+    if (!safe_print(philo, "has taken a fork") || !safe_print(philo, "has taken a fork"))
+      return 0;
+    both_forks_available = 1;
+    philo->left_fork[0] = 1;
+    philo->right_fork[0] = 1;
+  }
+  if (philo->id % 2 == 0)
+  {
+    pthread_mutex_unlock(philo->right_mutex);
+    pthread_mutex_unlock(philo->left_mutex);
+  }
+  else
+  {
+    pthread_mutex_unlock(philo->left_mutex);
+    pthread_mutex_unlock(philo->right_mutex);
+  }
+  //--------------------------------------------------------------//
+   if (both_forks_available)
   {
     philosopher_eat(philo);
     if(philo->id %2 == 0)
