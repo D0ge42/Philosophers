@@ -16,18 +16,16 @@ int	ft_atoi(char *str)
 	if (str[i] == '-' || str[i] == '+')
 	{
 		if (str[i] == '-')
-			sign *= -1;
+			return (0);
 		i++;
 	}
-	if (str[i] < '0' || str[i] > '9')
-		return (0);
 	while (str[i])
 	{
 		if (!ft_is_digit(str[i]))
 			return (0);
 		nb = (nb * 10) + (str[i] - '0');
-		// if (nb * sign > 2147483647 || (nb * sign) < -2147483648)
-		//   return (0);
+		if (nb * sign > 2147483647)
+			return (0);
 		i++;
 	}
 	return (nb * sign);

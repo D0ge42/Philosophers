@@ -5,7 +5,8 @@ SRC = srcs/philosophers.c \
 			srcs/time_handler.c \
 			srcs/threads.c \
 			srcs/routine.c \
-			srcs/clean_memory.c
+			srcs/clean_memory.c\
+			srcs/create.c
 
 OBJS = $(SRC:.c=.o)
 # BONUS_OBJS = $(BONUS_SRC:.c=.o)
