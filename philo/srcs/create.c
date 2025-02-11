@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-void	free_previous_philos(t_philo **philos, int i);
+static void	free_previous_philos(t_philo **philos, int i);
 
 t_philo	**create_philos(char **av)
 {
@@ -31,7 +31,6 @@ t_philo	**create_philos(char **av)
 	}
 	return (philos);
 }
-
 
 t_table	*create_table(char **av, int ac)
 {
@@ -72,7 +71,7 @@ t_table	*create_table(char **av, int ac)
 	return (table);
 }
 
-void	free_previous_philos(t_philo **philos, int i)
+static void	free_previous_philos(t_philo **philos, int i)
 {
 	while (i)
 	{

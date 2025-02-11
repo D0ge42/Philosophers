@@ -11,8 +11,6 @@ void	free_previous_philos(t_philo **philos, int i);
 t_philo	**create_philos(char **av);
 void	assign_and_initialize(t_philo **philos, t_table *table, char **av);
 
-
-
 int	main(int ac, char **av)
 {
 	t_philo	**philos;
@@ -29,6 +27,7 @@ int	main(int ac, char **av)
 	clean_table(table);
 	clean_philos(philos, av);
 }
+
 /*Each philospher will get a pointer to its left and right fork.
  * This pointers are pointers to the forks array.
  * We'll use philo->id to determine which forks philospher will be able

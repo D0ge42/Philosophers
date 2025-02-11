@@ -30,6 +30,7 @@ void	check_death(time_t last_meal_time, t_philo *philos)
 	}
 	pthread_mutex_unlock(philos->table->death_mutex);
 }
+
 /*While loop to create threads for each philosopher and join them.*/
 
 int	create_threads(t_philo **philos, t_table *table)

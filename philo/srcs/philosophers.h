@@ -52,9 +52,12 @@ typedef struct s_table
 	int					death_flag;
 }						t_table;
 
-t_philo	**create_philos(char **av);
-t_table	*create_table(char **av, int ac);
+t_philo					**create_philos(char **av);
+t_table					*create_table(char **av, int ac);
 
+int						safe_print(t_philo *philo, char *to_print);
+void					philosopher_take_right(t_philo *philo);
+void					philosopher_take_left(t_philo *philo);
 
 int						philosopher_take_forks(t_philo *philo);
 void					philosopher_eat(t_philo *philo);

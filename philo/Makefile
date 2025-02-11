@@ -2,11 +2,12 @@ NAME = philo
 
 SRC = srcs/philosophers.c \
 			srcs/input_parsing.c \
-			srcs/time_handler.c \
 			srcs/threads.c \
 			srcs/routine.c \
 			srcs/clean_memory.c\
-			srcs/create.c
+			srcs/create.c \
+			srcs/states_and_actions.c \
+			srcs/utils.c
 
 OBJS = $(SRC:.c=.o)
 # BONUS_OBJS = $(BONUS_SRC:.c=.o)
