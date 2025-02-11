@@ -4,6 +4,9 @@
 #include <pthread.h>
 #include <sys/time.h>
 
+/*Void function, takes pointer to table and cleans everything in it.
+ * Also responsible for destroying mutexes.*/
+
 void	clean_table(t_table *table)
 {
 	int	i;
@@ -21,10 +24,13 @@ void	clean_table(t_table *table)
 		}
 		i++;
 	}
+  pthread_mutex_destroy(table->death_mutex);
 	free(table->mutexes);
 	free(table->death_mutex);
 	free(table);
 }
+
+/*Just clean philos and philos array*/
 
 void	clean_philos(t_philo **philos, char **av)
 {

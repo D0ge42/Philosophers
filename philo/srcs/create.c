@@ -7,6 +7,11 @@
 static void	free_previous_philos(t_philo **philos, int i);
 void		create_mutexes(t_table *table);
 
+/*Function responsible for creating philos.
+ * It will allocate enough memory for an array
+ * of philos, memset it to 0, 
+ * and check for eventual malloc errors in philosophers creation.*/
+
 t_philo	**create_philos(char **av)
 {
 	int		philos_num;
@@ -32,6 +37,9 @@ t_philo	**create_philos(char **av)
 	}
 	return (philos);
 }
+
+/*Create table, forks int array and initialize everything.
+ * Also mutexes creation function is called in here.*/
 
 t_table	*create_table(char **av, int ac)
 {
