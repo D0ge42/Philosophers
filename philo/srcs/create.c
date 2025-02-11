@@ -5,6 +5,7 @@
 #include <sys/time.h>
 
 static void	free_previous_philos(t_philo **philos, int i);
+void		create_mutexes(t_table *table);
 
 t_philo	**create_philos(char **av)
 {
@@ -45,13 +46,6 @@ t_table	*create_table(char **av, int ac)
 	else
 		table->meals_to_eat = -1;
 	table->num_of_philos = ft_atoi(av[1]);
-	table->mutexes = malloc(sizeof(pthread_mutex_t) * table->num_of_philos);
-	if (!table->mutexes)
-	{
-		free(table);
-		return (NULL);
-	}
-	memset(table->mutexes, 0, sizeof(pthread_mutex_t) * table->num_of_philos);
 	table->forks = malloc(sizeof(int) * table->num_of_philos);
 	if (!table->forks)
 	{
@@ -59,16 +53,31 @@ t_table	*create_table(char **av, int ac)
 		free(table);
 		return (NULL);
 	}
+	memset(table->forks, 0, sizeof(int) * table->num_of_philos);
+	create_mutexes(table);
+	return (table);
+}
+
+/*Function to initialize and create death and forks mutexes*/
+
+void	create_mutexes(t_table *table)
+{
+	table->mutexes = malloc(sizeof(pthread_mutex_t) * table->num_of_philos);
+	if (!table->mutexes)
+	{
+		free(table);
+		return ;
+	}
+	memset(table->mutexes, 0, sizeof(pthread_mutex_t) * table->num_of_philos);
 	table->death_mutex = malloc(sizeof(pthread_mutex_t));
 	if (!table->death_mutex)
 	{
 		free(table->mutexes);
 		free(table->forks);
 		free(table);
-		return (NULL);
+		return ;
 	}
-	memset(table->forks, 0, sizeof(int) * table->num_of_philos);
-	return (table);
+	memset(table->death_mutex, 0, sizeof(pthread_mutex_t));
 }
 
 static void	free_previous_philos(t_philo **philos, int i)

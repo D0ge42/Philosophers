@@ -84,4 +84,3 @@ void	philosopher_think(t_philo *philo)
 		philo->is_thinking = 1;
 	}
 }
-

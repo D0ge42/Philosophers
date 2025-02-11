@@ -4,29 +4,14 @@
 #include <pthread.h>
 #include <sys/time.h>
 
+static void	parse_input_string(t_philo *philo, char *to_print);
+
 int	safe_print(t_philo *philo, char *to_print)
 {
 	pthread_mutex_lock(philo->table->death_mutex);
 	if (philo->table->death_flag == 0)
 	{
-		if (ft_strcmp(to_print, "is thinking") == 0)
-			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
-				philo->id, CYAN, to_print, RESET);
-		else if (ft_strcmp(to_print, "is eating") == 0)
-			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
-				philo->id, GREEN, to_print, RESET);
-		else if (ft_strcmp(to_print, "is sleeping") == 0)
-			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
-				philo->id, BLUE, to_print, RESET);
-		else if (ft_strcmp(to_print, "has taken a fork") == 0)
-			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
-				philo->id, YELLOW, to_print, RESET);
-		else if (ft_strcmp(to_print, "died") == 0)
-			printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time,
-				philo->id, RED, to_print, RESET);
-		else
-			printf("%li %i %s\n", time_to_ms() - philo->start_time, philo->id,
-				to_print);
+		parse_input_string(philo, to_print);
 		pthread_mutex_unlock(philo->table->death_mutex);
 		return (1);
 	}
@@ -36,6 +21,28 @@ int	safe_print(t_philo *philo, char *to_print)
 
 /*Custom time to sleep function. This is useful to let the philosophers
  * sleep for a certain amount of time, specified in the main args.*/
+
+static void	parse_input_string(t_philo *philo, char *to_print)
+{
+	if (ft_strcmp(to_print, "is thinking") == 0)
+		printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time, philo->id,
+			CYAN, to_print, RESET);
+	else if (ft_strcmp(to_print, "is eating") == 0)
+		printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time, philo->id,
+			GREEN, to_print, RESET);
+	else if (ft_strcmp(to_print, "is sleeping") == 0)
+		printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time, philo->id,
+			BLUE, to_print, RESET);
+	else if (ft_strcmp(to_print, "has taken a fork") == 0)
+		printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time, philo->id,
+			YELLOW, to_print, RESET);
+	else if (ft_strcmp(to_print, "died") == 0)
+		printf("%li %i %s%s%s\n", time_to_ms() - philo->start_time, philo->id,
+			RED, to_print, RESET);
+	else
+		printf("%li %i %s\n", time_to_ms() - philo->start_time, philo->id,
+			to_print);
+}
 
 int	custom_sleep(time_t time_to_sleep, t_philo *philo)
 {
