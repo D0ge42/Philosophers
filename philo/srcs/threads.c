@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   threads.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/12 10:22:00 by lonulli           #+#    #+#             */
+/*   Updated: 2025/02/12 10:22:01 by lonulli          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 #include <bits/pthreadtypes.h>
 #include <pthread.h>
@@ -10,7 +22,7 @@ void	assign_mutex_and_forks(t_philo *philo, pthread_mutex_t *mutex,
 /*Function to check if enough time has passed for a philospher
  * to die. It will take last meal time and do current_time
 	- time_since_last meal
- * If the time since last meal is greater than philo's time to die,
+ * If the time since last meal is >= than philo's time to die,
 	philo is dead.
  * */
 
@@ -26,7 +38,7 @@ void	check_death(time_t last_meal_time, t_philo *philos)
 		&& philos->table->death_flag == 0)
 	{
 		philos->table->death_flag = 1;
-		printf("%li %i died\n", current_time - philos->start_time, philos->id);
+		printf("%li %i has died\n", current_time - philos->start_time, philos->id);
 	}
 	pthread_mutex_unlock(philos->table->death_mutex);
 }

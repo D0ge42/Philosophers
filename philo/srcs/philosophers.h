@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/12 10:21:06 by lonulli           #+#    #+#             */
+/*   Updated: 2025/02/12 10:21:07 by lonulli          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
@@ -25,8 +37,8 @@ typedef struct s_table	t_table;
 typedef struct s_philo
 {
 	pthread_t			thread;
-	unsigned int		meals_eaten;
 	int					id;
+	unsigned int		meals_eaten;
 	time_t				start_time;
 	time_t				last_meal;
 	pthread_mutex_t		*left_mutex;
@@ -45,6 +57,7 @@ typedef struct s_table
 {
 	int					num_of_philos;
 	t_philo				*philos;
+	int					philos_full;
 	unsigned int		meals_to_eat;
 	pthread_mutex_t		*mutexes;
 	pthread_mutex_t		*death_mutex;

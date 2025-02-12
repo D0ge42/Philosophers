@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   create.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/12 10:21:12 by lonulli           #+#    #+#             */
+/*   Updated: 2025/02/12 10:21:14 by lonulli          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 #include <bits/pthreadtypes.h>
 #include <bits/types/struct_timeval.h>
@@ -9,7 +21,7 @@ void		create_mutexes(t_table *table);
 
 /*Function responsible for creating philos.
  * It will allocate enough memory for an array
- * of philos, memset it to 0, 
+ * of philos, memset it to 0,
  * and check for eventual malloc errors in philosophers creation.*/
 
 t_philo	**create_philos(char **av)
@@ -49,6 +61,7 @@ t_table	*create_table(char **av, int ac)
 	if (!table)
 		return (NULL);
 	memset(table, 0, sizeof(t_table));
+	table->philos_full = 0;
 	if (ac == 6)
 		table->meals_to_eat = ft_atoi(av[5]);
 	else

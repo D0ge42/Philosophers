@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   clean_memory.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/12 10:20:58 by lonulli           #+#    #+#             */
+/*   Updated: 2025/02/12 10:21:00 by lonulli          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 #include <bits/pthreadtypes.h>
 #include <bits/types/struct_timeval.h>
@@ -24,7 +36,7 @@ void	clean_table(t_table *table)
 		}
 		i++;
 	}
-  pthread_mutex_destroy(table->death_mutex);
+	pthread_mutex_destroy(table->death_mutex);
 	free(table->mutexes);
 	free(table->death_mutex);
 	free(table);
