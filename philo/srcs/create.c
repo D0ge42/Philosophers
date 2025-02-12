@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   create.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:21:12 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:21:14 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 12:20:30 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 #include <bits/pthreadtypes.h>
 #include <bits/types/struct_timeval.h>
 #include <pthread.h>
+#include <string.h>
 #include <sys/time.h>
 
 static void	free_previous_philos(t_philo **philos, int i);
 void		create_mutexes(t_table *table);
+static void	free_mutexes(t_table *table);
 
 /*Function responsible for creating philos.
  * It will allocate enough memory for an array
@@ -99,6 +101,21 @@ void	create_mutexes(t_table *table)
 		return ;
 	}
 	memset(table->death_mutex, 0, sizeof(pthread_mutex_t));
+	table->meals_mutex = malloc(sizeof(pthread_mutex_t));
+	if (!table->meals_mutex)
+	{
+		free_mutexes(table);
+		return ;
+	}
+	memset(table->meals_mutex, 0, sizeof(pthread_mutex_t));
+}
+
+static void	free_mutexes(t_table *table)
+{
+	free(table->death_mutex);
+	free(table->mutexes);
+	free(table->forks);
+	free(table);
 }
 
 static void	free_previous_philos(t_philo **philos, int i)

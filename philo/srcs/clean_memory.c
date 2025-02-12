@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean_memory.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:20:58 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:21:00 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 12:16:53 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,10 @@ void	clean_table(t_table *table)
 		i++;
 	}
 	pthread_mutex_destroy(table->death_mutex);
+	pthread_mutex_destroy(table->meals_mutex);
 	free(table->mutexes);
 	free(table->death_mutex);
+	free(table->meals_mutex);
 	free(table);
 }
 

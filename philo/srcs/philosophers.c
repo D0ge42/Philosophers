@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:21:32 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:21:33 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 12:17:06 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void	initializer(t_philo **philos, int index, char **av, t_table *table)
 {
 	pthread_mutex_init(&table->mutexes[index], NULL);
 	pthread_mutex_init(table->death_mutex, NULL);
+	pthread_mutex_init(table->meals_mutex, NULL);
 	philos[index]->is_thinking = 0;
 	philos[index]->start_time = time_to_ms();
 	philos[index]->table = table;

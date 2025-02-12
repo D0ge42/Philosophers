@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:21:06 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:21:07 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 12:16:40 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ typedef struct s_table
 	unsigned int		meals_to_eat;
 	pthread_mutex_t		*mutexes;
 	pthread_mutex_t		*death_mutex;
+	pthread_mutex_t		*meals_mutex;
 	int					*forks;
 	int					death_flag;
 }						t_table;

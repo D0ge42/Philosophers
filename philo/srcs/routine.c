@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:21:39 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:21:40 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 13:59:51 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 #include <pthread.h>
 #include <unistd.h>
 
-void	is_even_or_odd(t_philo *philo);
+static void	is_even_or_odd(t_philo *philo);
+static int	meals_eaten_check(t_philo *philo);
+
 /*Philosophers routine.
  * Check death at the start.
  * Let philosophers thinks
@@ -40,20 +42,16 @@ void	*routine(void *pointer)
 	philo = (t_philo *)pointer;
 	while (1)
 	{
-		if (philo->table->meals_to_eat == 0)
-			break ;
 		check_death(philo->last_meal, philo);
+		if (philo->table->meals_to_eat == 0 || philo->table->death_flag)
+			break ;
 		if (philo->is_thinking == 0 && philo->n_forks == 0)
 			philosopher_think(philo);
-		if (philo->table->death_flag)
-			break ;
 		is_even_or_odd(philo);
 		if (philo->n_forks == 2)
 		{
 			philosopher_eat(philo);
-			if (philo->meals_eaten == philo->table->meals_to_eat)
-				philo->table->philos_full++;
-			if (philo->table->philos_full == philo->table->num_of_philos)
+			if (meals_eaten_check(philo))
 				break ;
 			philosopher_sleep(philo);
 		}
@@ -61,7 +59,25 @@ void	*routine(void *pointer)
 	return (0);
 }
 
-void	is_even_or_odd(t_philo *philo)
+static int	meals_eaten_check(t_philo *philo)
+{
+	if (philo->meals_eaten == philo->table->meals_to_eat)
+	{
+		pthread_mutex_lock(philo->table->meals_mutex);
+		philo->table->philos_full++;
+		pthread_mutex_unlock(philo->table->meals_mutex);
+	}
+	pthread_mutex_lock(philo->table->meals_mutex);
+	if (philo->table->philos_full == philo->table->num_of_philos)
+	{
+		pthread_mutex_unlock(philo->table->meals_mutex);
+		return (1);
+	}
+	pthread_mutex_unlock(philo->table->meals_mutex);
+	return (0);
+}
+
+static void	is_even_or_odd(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
 	{

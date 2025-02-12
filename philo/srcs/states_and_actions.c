@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   states_and_actions.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:21:51 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:21:52 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 12:13:25 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,7 @@ void	philosopher_eat(t_philo *philo)
 	if (!safe_print(philo, "is eating"))
 		return ;
 	if (custom_sleep(philo->time_to_eat, philo))
-	{
 		return ;
-	}
 	philo->meals_eaten++;
 	philo->n_forks = 0;
 	pthread_mutex_lock(philo->right_mutex);

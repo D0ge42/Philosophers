@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   threads.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lonulli <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:22:00 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 10:22:01 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/12 12:17:40 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ void	check_death(time_t last_meal_time, t_philo *philos)
 		&& philos->table->death_flag == 0)
 	{
 		philos->table->death_flag = 1;
-		printf("%li %i has died\n", current_time - philos->start_time, philos->id);
+		printf("%li %i has died\n", current_time - philos->start_time,
+			philos->id);
 	}
 	pthread_mutex_unlock(philos->table->death_mutex);
 }
