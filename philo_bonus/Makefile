@@ -3,7 +3,12 @@ NAME = philo_bonus
 SRC = srcs/input_parsing.c \
 	  srcs/philosophers_bonus.c \
 	  srcs/clean_processes.c \
-	  srcs/utils.c
+	  srcs/utils.c\
+	  srcs/routine.c\
+	  srcs/actions.c\
+	  srcs/create_bonus.c\
+	  srcs/initialize.c\
+	  srcs/utils2.c
 
 OBJS = $(SRC:.c=.o)
 

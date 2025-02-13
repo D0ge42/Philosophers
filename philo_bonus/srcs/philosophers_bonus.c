@@ -11,10 +11,14 @@
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
+#include <fcntl.h>
+#include <semaphore.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-pid_t	**create_processes(pid_t **philos, int num_philos);
-void init_processes(pid_t **philos, int num_philos);
+pid_t	**create_processes(pid_t **processes, int num_philos);
+void init_processes(pid_t **processes,t_philo **philos,t_table *table, sem_t *forks);
+void unlink_sems(t_philo **philos, t_table *table);
 
 // Semaphore starting value will be n_fork.
 // Every process will be able to access semaphore
@@ -26,21 +30,26 @@ void init_processes(pid_t **philos, int num_philos);
 
 int	main(int ac, char **av)
 {
-	sem_t	*semaphore;
-	pid_t	**philos = NULL;
-	int		num_philos;
+	t_philo **philos = NULL;
+	pid_t	**processes = NULL;
+	t_table *table = NULL;
+	sem_t *forks;
 
 	if (ac == 1)
 		return (0);
 	if (!is_input_valid(ac, av))
-	{
 		return (0);
-	}
-	num_philos = ft_atoi(av[1]);
-	sem_open(SEMAPHORE, O_CREAT, 0644, num_philos);
-	philos = create_processes(philos, num_philos);
-	init_processes(philos, num_philos);
+	philos = create_philos(av);
+	table = create_table(av,ac);
+	table_initializer(table, av, ac);
+	forks = sem_open(FORKS,O_CREAT,0644,table->num_of_philos);
+	unlink_sems(philos, table);
+	processes = create_processes(processes, table->num_of_philos);
+	init_processes(processes, philos,table,forks);
+	sem_close(forks);
 }
+
+/*Function to create an array of processes.*/
 
 pid_t	**create_processes(pid_t **philos, int num_philos)
 {
@@ -55,32 +64,65 @@ pid_t	**create_processes(pid_t **philos, int num_philos)
 	return (philos);
 }
 
-void init_processes(pid_t **philos, int num_philos)
+void unlink_sems(t_philo **philos, t_table *table)
 {
 	int i = 0;
-	i = 0;
-	while (i < num_philos)
+	sem_unlink(FORKS);
+	while(i < table->num_of_philos)
 	{
-		*philos[i] = fork();
-		if (*philos[i] == -1)
+		sem_unlink(philos[i]->sem_name);
+		i++;
+	}
+}
+
+/*Function to initialize each process.*/ 
+void init_processes(pid_t **processes, t_philo **philos,t_table *table, sem_t *forks)
+{
+	int i = 0;
+	while (i < table->num_of_philos)
+	{
+		philos[i]->id = i + 1;
+		philos[i]->table = table;
+		philos[i]->last_meal = time_to_ms();
+		(*processes)[i] = fork();
+		if ((*processes)[i] == -1)
 		{
+			//Clean everything
+			clean_processes(processes,table->num_of_philos);
 			return ;
-			// Free previously allocated processes
 			//Exit 
 		}
-		else if (*philos[i] == 0)
+		else if ((*processes)[i] == 0)
 		{
-			printf("%i\n",i);
-			exit(0);
+			routine(philos[i], forks);
 			//Child process
 			//Execute routine for each process at index [i];
 		}
 		i++;
 	}
 	i = 0;
-	while(i < num_philos)
+		// int ret = waitpid(-1,&status,WNOHANG);
+	while(1)
 	{
-		waitpid(*philos[i],NULL,WNOHANG);
-		i++;
-	}
+
+		int j = 0;
+		while(i < table->num_of_philos / 2)
+		{
+			sem_post(philos[i + j]->semaphore);
+			philos[i + j]->last_meal = time_to_ms();
+			int k = check_death(philos[i + j]->last_meal, philos[i + j]);
+			if (k)
+			{
+				i = 0;
+				while(i < table->num_of_philos)
+				{
+					kill((*processes)[i],SIGKILL);
+					i++;
+				}
+				exit(1);
+			}
+			j+=2;
+		}
+		i = (i + 1) % table->num_of_philos;
+	}	
 }

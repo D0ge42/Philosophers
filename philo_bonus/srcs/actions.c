@@ -12,14 +12,33 @@
 
 #include "philosophers_bonus.h"
 
-void clean_processes(pid_t **philos, int num_philos)
+void philosopher_eat(t_philo *philo)
 {
-	int i  = 0;
-	while(i < num_philos)
-	{
-		free(philos[i]);
-		i++;
-	}
-	free(philos);
+	if (safe_print(philo, "is eating"))
+		return;
+	custom_sleep(philo->table->time_to_eat,philo);
 }
 
+void philosopher_sleep(t_philo *philo)
+{
+	if (safe_print(philo, "is sleeping"))
+		return ;
+	custom_sleep(philo->table->time_to_sleep,philo);
+}
+
+void philosopher_think(t_philo *philo)
+{
+	if (safe_print(philo, "is thinking"))
+		return ;
+}
+
+// void philosopher_drop_fork(t_philo *philo)
+// {
+// 	safe_print(philo, "dropped a fork");
+// }
+
+void philosopher_took_fork(t_philo *philo)
+{
+	if (safe_print(philo, "has taken a fork"))
+		return ;
+}

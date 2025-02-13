@@ -12,14 +12,15 @@
 
 #include "philosophers_bonus.h"
 
-void clean_processes(pid_t **philos, int num_philos)
+void table_initializer(t_table *table, char **av, int ac)
 {
-	int i  = 0;
-	while(i < num_philos)
-	{
-		free(philos[i]);
-		i++;
-	}
-	free(philos);
+	table->start_time = time_to_ms();
+	table->num_of_philos = ft_atoi(av[1]);
+	table->time_to_die = ft_atoi(av[2]);
+	table->time_to_eat = ft_atoi(av[3]);
+	table->time_to_sleep = ft_atoi(av[4]);
+	if (ac == 6)
+		table->meals_to_eat = ft_atoi(av[5]);
+	else
+		table->meals_to_eat = -1;
 }
-
