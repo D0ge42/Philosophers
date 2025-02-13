@@ -108,9 +108,9 @@ void init_processes(pid_t **processes, t_philo **philos,t_table *table, sem_t *f
 		int j = 0;
 		while(i < table->num_of_philos / 2)
 		{
-			sem_post(philos[i + j]->semaphore);
-			philos[i + j]->last_meal = time_to_ms();
-			int k = check_death(philos[i + j]->last_meal, philos[i + j]);
+			sem_post(philos[i + j % table->num_of_philos]->semaphore);
+			philos[i + j % table->num_of_philos]->last_meal = time_to_ms();
+			int k = check_death(philos[i + j % table->num_of_philos]->last_meal, philos[i + j % table->num_of_philos]);
 			if (k)
 			{
 				i = 0;
@@ -124,5 +124,6 @@ void init_processes(pid_t **processes, t_philo **philos,t_table *table, sem_t *f
 			j+=2;
 		}
 		i = (i + 1) % table->num_of_philos;
+		usleep(table->time_to_eat);
 	}	
 }
