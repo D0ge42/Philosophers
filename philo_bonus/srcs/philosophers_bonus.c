@@ -13,12 +13,15 @@
 #include "philosophers_bonus.h"
 #include <fcntl.h>
 #include <semaphore.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 pid_t	**create_processes(pid_t **processes, int num_philos);
 void init_processes(pid_t **processes,t_philo **philos,t_table *table, sem_t *forks);
 void unlink_sems(t_philo **philos, t_table *table);
+int check_philos_health(t_philo **philos, t_table *table);
+void wait_pid_and_exit(t_philo **philo, t_table *table, pid_t **processes);
 
 // Semaphore starting value will be n_fork.
 // Every process will be able to access semaphore
@@ -43,6 +46,7 @@ int	main(int ac, char **av)
 	table = create_table(av,ac);
 	table_initializer(table, av, ac);
 	forks = sem_open(FORKS,O_CREAT,0644,table->num_of_philos);
+	sem_unlink("/printblock");
 	unlink_sems(philos, table);
 	processes = create_processes(processes, table->num_of_philos);
 	init_processes(processes, philos,table,forks);
@@ -68,6 +72,7 @@ void unlink_sems(t_philo **philos, t_table *table)
 {
 	int i = 0;
 	sem_unlink(FORKS);
+	sem_unlink("/printblock");
 	while(i < table->num_of_philos)
 	{
 		sem_unlink(philos[i]->sem_name);
@@ -84,46 +89,39 @@ void init_processes(pid_t **processes, t_philo **philos,t_table *table, sem_t *f
 		philos[i]->id = i + 1;
 		philos[i]->table = table;
 		philos[i]->last_meal = time_to_ms();
-		(*processes)[i] = fork();
-		if ((*processes)[i] == -1)
+		philos[i]->pid = fork();
+		if ((philos[i]->pid) == -1)
 		{
-			//Clean everything
 			clean_processes(processes,table->num_of_philos);
 			return ;
-			//Exit 
 		}
-		else if ((*processes)[i] == 0)
-		{
+		else if ((philos[i]->pid) == 0)
 			routine(philos[i], forks);
-			//Child process
-			//Execute routine for each process at index [i];
+		i++;
+	}
+	wait_pid_and_exit(philos,table,processes);
+}
+	
+void wait_pid_and_exit(t_philo **philo, t_table *table, pid_t **processes)
+{
+	(void)processes;
+	int i;
+	int status;
+	i = 0;
+	while(i < table->num_of_philos)
+	{
+		waitpid(-1,&status,0);
+		if (status != 0)
+		{
+			i = 0;
+			while(i < table->num_of_philos)
+			{
+				kill(philo[i]->pid,SIGKILL);
+				i++;
+			}
+			break;
 		}
 		i++;
 	}
-	i = 0;
-		// int ret = waitpid(-1,&status,WNOHANG);
-	while(1)
-	{
-
-		int j = 0;
-		while(i < table->num_of_philos / 2)
-		{
-			sem_post(philos[i + j % table->num_of_philos]->semaphore);
-			philos[i + j % table->num_of_philos]->last_meal = time_to_ms();
-			int k = check_death(philos[i + j % table->num_of_philos]->last_meal, philos[i + j % table->num_of_philos]);
-			if (k)
-			{
-				i = 0;
-				while(i < table->num_of_philos)
-				{
-					kill((*processes)[i],SIGKILL);
-					i++;
-				}
-				exit(1);
-			}
-			j+=2;
-		}
-		i = (i + 1) % table->num_of_philos;
-		usleep(table->time_to_eat);
-	}	
+	//Free everything
 }

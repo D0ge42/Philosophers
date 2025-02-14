@@ -16,6 +16,7 @@
 
 
 // Define color codes
+#include <sched.h>
 # define RESET "\x1B[0m"
 # define RED "\x1B[31m"
 # define GREEN "\x1B[32m"
@@ -51,7 +52,10 @@ typedef struct s_philo
 	int					is_thinking;
 	char 				*sem_name;
 	sem_t				*semaphore;
-	}						t_philo;
+	pthread_t			monitor;
+	int					pid;
+	sem_t				*print_block;
+}						t_philo;
 
 typedef struct s_table
 {
@@ -66,7 +70,6 @@ typedef struct s_table
 	time_t				time_to_die;
 	time_t				time_to_eat;
 	time_t				time_to_sleep;
-
 }						t_table;
 
 int						safe_print(t_philo *philo, char *to_print);
