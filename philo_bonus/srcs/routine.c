@@ -17,24 +17,23 @@
 
 void *monitor(void *ptr)
 {
-	t_philo *philo;
-	philo = (t_philo *)ptr;
-	while(1)
-	{
-		if (time_to_ms() - philo->last_meal >= philo->table->time_to_die)
-		{
-			philo->table->death_flag = 1;
-			break;
-		}
-		if (philo->meals_eaten >= philo->table->meals_to_eat)
+    t_philo *philo = (t_philo *)ptr;
+    while(1)
+    {
+        if (time_to_ms() - philo->last_meal >= philo->table->time_to_die)
+        {
+            philo->table->death_flag = 1;
+            break;  // Return instead of exit
+        }
+        if (philo->meals_eaten >= philo->table->meals_to_eat)
 			break;
 	}
+	usleep(1000);
 	if (philo->table->death_flag == 1)
 		exit(philo->id);
-	else if (philo->meals_eaten >= philo->table->meals_to_eat)
-		exit(0);
 	else
 		exit(0);
+    return NULL;
 }
 
 /*Each philo will access forks on the table by passing 2 sem_wait.
@@ -44,9 +43,10 @@ void routine(t_philo *philo, sem_t *forks)
 {
 	if (pthread_create(&philo->monitor,NULL, &monitor, philo))
 	{
-		printf("Failed to create thread\n");
+		printf("failed to create thread\n");
 		exit(0);
 	}
+	pthread_detach(philo->monitor);
 	if (philo->id % 2 == 1)
 		usleep(1000);
 	while(philo->table->death_flag == 0)
@@ -64,6 +64,7 @@ void routine(t_philo *philo, sem_t *forks)
 		philosopher_sleep(philo);
 		usleep(100);
 	}
-	pthread_join(philo->monitor, NULL);
+	sem_close(philo->semaphore);
+	sem_close(philo->semaphore);
 }
 

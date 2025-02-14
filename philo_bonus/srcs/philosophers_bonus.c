@@ -74,9 +74,9 @@ void unlink_sems(t_philo **philos, t_table *table)
 	int i = 0;
 	sem_unlink(FORKS);
 	sem_unlink("/printblock");
-	sem_close(philos[i]->print_block);
 	while(i < table->num_of_philos)
 	{
+		sem_close(philos[i]->print_block);
 		sem_close(philos[i]->semaphore);
 		sem_unlink(philos[i]->sem_name);
 		i++;
@@ -113,10 +113,13 @@ void init_processes(pid_t **processes, t_philo **philos,t_table *table, sem_t *f
 		if ((philos[i]->pid) == -1)
 		{
 			clean_processes(processes,table->num_of_philos);
+			free(philos[i]);
 			return ;
 		}
 		else if ((philos[i]->pid) == 0)
+		{
 			routine(philos[i], forks);
+		}
 		i++;
 	}
 	wait_pid_and_exit(philos,table,processes);
