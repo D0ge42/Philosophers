@@ -12,7 +12,7 @@
 
 #include "philosophers_bonus.h"
 
-void table_initializer(t_table *table, char **av, int ac)
+void	table_initializer(t_table *table, char **av, int ac)
 {
 	table->start_time = time_to_ms();
 	table->num_of_philos = ft_atoi(av[1]);

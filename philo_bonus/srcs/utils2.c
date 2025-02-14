@@ -13,7 +13,7 @@
 #include "philosophers_bonus.h"
 #include <stdio.h>
 
-static char	*ft_strcpy(char *dest, char *src);
+static char			*ft_strcpy(char *dest, char *src);
 static unsigned int	digit_count(int nb);
 
 char	*ft_itoa(int n)
@@ -44,20 +44,22 @@ char	*ft_itoa(int n)
 	return (str);
 }
 
-int ft_strlen(char const *s1)
+int	ft_strlen(char const *s1)
 {
-	int i  = 0;
-	while(s1[i])
+	int	i;
+
+	i = 0;
+	while (s1[i])
 		i++;
-	return i;
+	return (i);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char		*result;
-	size_t		s1len;
-	size_t		s2len;
-	char		*ret;
+	char	*result;
+	size_t	s1len;
+	size_t	s2len;
+	char	*ret;
 
 	s1len = ft_strlen(s1);
 	s2len = ft_strlen(s2);
@@ -105,4 +107,3 @@ static char	*ft_strcpy(char *dest, char *src)
 	*dest = '\0';
 	return (orig);
 }
-

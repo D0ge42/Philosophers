@@ -12,14 +12,15 @@
 
 #include "philosophers_bonus.h"
 
-void clean_processes(pid_t **philos, int num_philos)
+void	clean_processes(pid_t **philos, int num_philos)
 {
-	int i  = 0;
-	while(i < num_philos)
+	int	i;
+
+	i = 0;
+	while (i < num_philos)
 	{
 		free(philos[i]);
 		i++;
 	}
 	free(philos);
 }
-

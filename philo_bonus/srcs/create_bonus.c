@@ -12,48 +12,32 @@
 
 #include "philosophers_bonus.h"
 #include <fcntl.h>
+#include <string.h>
 
-static void	free_previous_philos(t_philo **philos, int i);
-
-t_philo	**create_philos(char **av)
+void	create_philos(char **av, t_philo *philos)
 {
 	int		philos_num;
 	int		i;
-	t_philo	**philos;
+	char	*str;
 
 	philos_num = ft_atoi(av[1]);
 	i = 0;
-	philos = malloc(sizeof(t_philo *) * ft_atoi(av[1]));
-	if (!philos)
-		return (NULL);
-	memset(philos, 0, sizeof(t_philo *) * ft_atoi(av[1]));
 	while (i < philos_num)
 	{
-		philos[i] = malloc(sizeof(t_philo));
-		if (!philos[i])
-		{
-			free_previous_philos(philos, i);
-			return (0);
-		}
-		memset(philos[i], 0, sizeof(t_philo));
-		char *str = ft_itoa(i + 1);
-		philos[i]->sem_name = ft_strjoin("/philosophers",str);
+		memset(&philos[i], 0, sizeof(t_philo));
+		str = ft_itoa(i + 1);
+		strcpy(philos[i].sem_name, "/philosophers");
+		strcat(philos[i].sem_name, str);
 		free(str);
-		philos[i]->semaphore = sem_open(philos[i]->sem_name,O_CREAT | O_EXCL,0644,0);
-		philos[i]->print_block = sem_open("/printblock",O_CREAT,0644,1);
+		philos[i].semaphore = sem_open(philos[i].sem_name, O_CREAT | O_EXCL,
+				0644, 0);
+		philos[i].print_block = sem_open("/printblock", O_CREAT, 0644, 1);
 		i++;
 	}
-	return (philos);
 }
 
-
-t_table	*create_table(char **av, int ac)
+void	create_table(char **av, int ac, t_table *table)
 {
-	t_table	*table;
-
-	table = malloc(sizeof(t_table));
-	if (!table)
-		return (NULL);
 	memset(table, 0, sizeof(t_table));
 	table->philos_full = 0;
 	if (ac == 6)
@@ -61,18 +45,4 @@ t_table	*create_table(char **av, int ac)
 	else
 		table->meals_to_eat = -1;
 	table->num_of_philos = ft_atoi(av[1]);
-	return (table);
 }
-
-static void	free_previous_philos(t_philo **philos, int i)
-{
-	while (i)
-	{
-		free(philos[i]);
-		i--;
-	}
-	free(philos);
-	return ;
-}
-
-
