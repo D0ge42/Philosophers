@@ -12,6 +12,7 @@
 
 #include "philosophers_bonus.h"
 #include <fcntl.h>
+#include <pthread.h>
 #include <semaphore.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -22,6 +23,7 @@ void init_processes(pid_t **processes,t_philo **philos,t_table *table, sem_t *fo
 void unlink_sems(t_philo **philos, t_table *table);
 int check_philos_health(t_philo **philos, t_table *table);
 void wait_pid_and_exit(t_philo **philo, t_table *table, pid_t **processes);
+void free_everything(t_philo **philo,t_table *table, pid_t **processes);
 
 // Semaphore starting value will be n_fork.
 // Every process will be able to access semaphore
@@ -29,7 +31,6 @@ void wait_pid_and_exit(t_philo **philo, t_table *table, pid_t **processes);
 // Forks are in the middle so every philo will access 2 forks
 // whenver semaphore will allow them to.
 // if a philosophers dies we can exit ?
-//
 
 int	main(int ac, char **av)
 {
@@ -46,10 +47,10 @@ int	main(int ac, char **av)
 	table = create_table(av,ac);
 	table_initializer(table, av, ac);
 	forks = sem_open(FORKS,O_CREAT,0644,table->num_of_philos);
-	sem_unlink("/printblock");
 	unlink_sems(philos, table);
 	processes = create_processes(processes, table->num_of_philos);
 	init_processes(processes, philos,table,forks);
+	free_everything(philos,table,processes);
 	sem_close(forks);
 }
 
@@ -73,11 +74,29 @@ void unlink_sems(t_philo **philos, t_table *table)
 	int i = 0;
 	sem_unlink(FORKS);
 	sem_unlink("/printblock");
+	sem_close(philos[i]->print_block);
 	while(i < table->num_of_philos)
 	{
+		sem_close(philos[i]->semaphore);
 		sem_unlink(philos[i]->sem_name);
 		i++;
 	}
+}
+
+void free_everything(t_philo **philo,t_table *table,pid_t **processes)
+{
+	int i = 0;
+	while(i < table->num_of_philos)
+	{
+
+		free(philo[i]->sem_name);
+		free(philo[i]);
+		free(processes[i]);
+		i++;
+	}
+	free(processes);
+	free(table);
+	free(philo);
 }
 
 /*Function to initialize each process.*/ 
@@ -86,6 +105,7 @@ void init_processes(pid_t **processes, t_philo **philos,t_table *table, sem_t *f
 	int i = 0;
 	while (i < table->num_of_philos)
 	{
+		philos[i]->meals_eaten = 0;
 		philos[i]->id = i + 1;
 		philos[i]->table = table;
 		philos[i]->last_meal = time_to_ms();
@@ -111,17 +131,18 @@ void wait_pid_and_exit(t_philo **philo, t_table *table, pid_t **processes)
 	while(i < table->num_of_philos)
 	{
 		waitpid(-1,&status,0);
-		if (status != 0)
+		if (status)
 		{
+			int philo_id = WEXITSTATUS(status);
 			i = 0;
 			while(i < table->num_of_philos)
 			{
 				kill(philo[i]->pid,SIGKILL);
 				i++;
 			}
+			printf("%li %i has died\n",time_to_ms() - table->start_time,philo_id);
 			break;
 		}
 		i++;
 	}
-	//Free everything
 }

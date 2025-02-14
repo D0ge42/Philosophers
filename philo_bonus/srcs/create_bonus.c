@@ -36,7 +36,9 @@ t_philo	**create_philos(char **av)
 			return (0);
 		}
 		memset(philos[i], 0, sizeof(t_philo));
-		philos[i]->sem_name = ft_strjoin("/philosophers",ft_itoa(i + 1));
+		char *str = ft_itoa(i + 1);
+		philos[i]->sem_name = ft_strjoin("/philosophers",str);
+		free(str);
 		philos[i]->semaphore = sem_open(philos[i]->sem_name,O_CREAT | O_EXCL,0644,0);
 		philos[i]->print_block = sem_open("/printblock",O_CREAT,0644,1);
 		i++;

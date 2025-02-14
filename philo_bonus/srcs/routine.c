@@ -19,21 +19,20 @@ void *monitor(void *ptr)
 {
 	t_philo *philo;
 	philo = (t_philo *)ptr;
-
 	while(1)
 	{
 		if (time_to_ms() - philo->last_meal >= philo->table->time_to_die)
 		{
-			sem_wait(philo->print_block);
-			printf("%i has died\n",philo->id);
 			philo->table->death_flag = 1;
-			sem_post(philo->print_block);
 			break;
 		}
+		if (philo->meals_eaten >= philo->table->meals_to_eat)
+			break;
 	}
-	// If philo is dead, exit the process.
 	if (philo->table->death_flag == 1)
-		exit(1);
+		exit(philo->id);
+	else if (philo->meals_eaten >= philo->table->meals_to_eat)
+		exit(0);
 	else
 		exit(0);
 }
@@ -48,9 +47,9 @@ void routine(t_philo *philo, sem_t *forks)
 		printf("Failed to create thread\n");
 		exit(0);
 	}
-	if (philo->id %2 == 1)
+	if (philo->id % 2 == 1)
 		usleep(1000);
-	while(1)
+	while(philo->table->death_flag == 0)
 	{
 		philosopher_think(philo);
 		sem_wait(forks);
@@ -59,11 +58,12 @@ void routine(t_philo *philo, sem_t *forks)
 		philosopher_took_fork(philo);
 		philo->last_meal = time_to_ms();
 		philosopher_eat(philo);
+		philo->meals_eaten+=1;
 		sem_post(forks);
 		sem_post(forks);
 		philosopher_sleep(philo);
+		usleep(100);
 	}
-	// if (pthread_join(philo->monitor,NULL))
-	// 	printf("Error in joining thread\n");
+	pthread_join(philo->monitor, NULL);
 }
 
