@@ -23,7 +23,7 @@ void *routine(void *ptr)
   if (philo->id %2 == 1)
     usleep(500);
 
-  while(philo->table->death_flag == 0 && philo->table->philos_full == 0)
+  while(1)
   {
 
     philosopher_think(philo);
@@ -47,7 +47,7 @@ void *routine(void *ptr)
     
     usleep(100);
   }
-  return (void *)(intptr_t)philo->id;
+  return (void *)(size_t)philo->id;
 }
 
 /*Each philo will access forks on the table by passing 2 sem_wait.
@@ -75,6 +75,7 @@ void monitor(t_philo *philo, sem_t *forks, sem_t *print_block)
       routine_sem_unlink(philo, forks, print_block);
       exit(philo->id);
     }
+
     sem_wait(philo->table->death_sem);
     unsigned int meals_eaten = philo->meals_eaten;
     sem_post(philo->table->death_sem);
