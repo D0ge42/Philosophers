@@ -58,11 +58,11 @@ int	check_death(time_t last_meal_time, t_philo *philos)
 
 	current_time = time_to_ms();
 	time_since_last_meal = current_time - last_meal_time;
-	if (time_since_last_meal >= philos->table->time_to_die )
+	if (time_since_last_meal >= philos->table->time_to_die)
 	{
 		philos->table->death_flag = 1;
 		// printf("%li %i has died\n", current_time - philos->table->start_time,
-			// philos->id);
+		// philos->id);
 		return (1);
 	}
 	return (0);
@@ -75,10 +75,7 @@ int	custom_sleep(time_t time_to_sleep, t_philo *philo)
 	(void)philo;
 	start = time_to_ms() + time_to_sleep;
 	while ((time_to_ms() < start))
-	{
-		// check_death(philo->last_meal, philo);
 		usleep(50);
-	}
 	return (0);
 }
 

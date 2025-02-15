@@ -14,37 +14,26 @@
 
 void	philosopher_eat(t_philo *philo)
 {
-	// if (safe_print(philo, "is eating"))
-	// 	return ;
-	printf("%li %i is eating\n",time_to_ms() - philo->table->start_time,philo->id);
-  custom_sleep(philo->table->time_to_eat, philo);
+	printf("%li %i is eating\n", time_to_ms() - philo->table->start_time,
+		philo->id);
+	custom_sleep(philo->table->time_to_eat, philo);
 }
 
 void	philosopher_sleep(t_philo *philo)
 {
-	// if (safe_print(philo, "is sleeping"))
-	// 	return ;
-	
-	printf("%li %i is sleeping\n",time_to_ms() - philo->table->start_time,philo->id);
-  custom_sleep(philo->table->time_to_sleep, philo);
+	printf("%li %i is sleeping\n", time_to_ms() - philo->table->start_time,
+		philo->id);
+	custom_sleep(philo->table->time_to_sleep, philo);
 }
 
 void	philosopher_think(t_philo *philo)
 {
-
-	printf("%li %i is thinking\n",time_to_ms() - philo->table->start_time,philo->id);
-	// if (safe_print(philo, "is thinking"))
-	// 	return ;
+	printf("%li %i is thinking\n", time_to_ms() - philo->table->start_time,
+		philo->id);
 }
-
-// void philosopher_drop_fork(t_philo *philo)
-// {
-// 	safe_print(philo, "dropped a fork");
-// }
 
 void	philosopher_took_fork(t_philo *philo)
 {
-	printf("%li %i has taken a fork\n",time_to_ms() - philo->table->start_time,philo->id);
-	// if (safe_print(philo, "has taken a fork"))
-		// return ;
+	printf("%li %i has taken a fork\n", time_to_ms() - philo->table->start_time,
+		philo->id);
 }
