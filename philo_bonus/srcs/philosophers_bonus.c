@@ -25,7 +25,7 @@ void	unlink_sems(t_philo *philos, t_table *table);
 void	wait_pid_and_exit(t_philo *philo, t_table *table);
 void	free_everything(t_philo **philo, t_table *table, pid_t **processes);
 void	free_processes(pid_t **processes, t_table *table);
-
+void school_shooting(t_philo *philo);
 // Semaphore starting value will be n_fork.
 // Every process will be able to access semaphore
 // trough semaphore name.
@@ -111,15 +111,20 @@ void	wait_pid_and_exit(t_philo *philo, t_table *table)
 		{
 			philo_id = WEXITSTATUS(status);
 			i = 0;
-			while (i < table->num_of_philos)
-			{
-				kill(philo[i].pid, SIGKILL);
-				i++;
-			}
-			printf("%li %i has died\n", time_to_ms() - table->start_time,
-				philo_id);
+      school_shooting(philo);
+			printf("%li %i has died\n", time_to_ms() - table->start_time,philo_id);
 			break ;
 		}
 		i++;
 	}
+}
+
+void school_shooting(t_philo *philo)
+{
+  int i = 0;
+  while (i < philo->table->num_of_philos)
+	{
+				kill(philo[i].pid, SIGKILL);
+        i++;
+			}
 }

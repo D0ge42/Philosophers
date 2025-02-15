@@ -22,10 +22,16 @@ void *monitor(void *ptr)
   while(1)
   {
     sem_wait(philo->table->death_sem);
-    int death = check_death(philo->last_meal, philo);
+    // int death = check_death(philo->last_meal, philo);
+    int death = (time_to_ms() - philo->last_meal > philo->table->time_to_die);
     sem_post(philo->table->death_sem);
     if (death)
+    {
+      sem_wait(philo->table->death_sem);
+      philo->table->death_flag = 1;
+      sem_post(philo->table->death_sem);
       return (void *)(size_t)philo->id;
+    }
     sem_wait(philo->table->death_sem);
     unsigned int meals_eaten = philo->meals_eaten;
     sem_post(philo->table->death_sem);
@@ -45,6 +51,8 @@ void *monitor(void *ptr)
 
 void routine(t_philo *philo, sem_t *forks, sem_t *print_block)
 {
+  philo->free_printblock = print_block;
+  philo->free_forks = forks;
   if (philo->table->num_of_philos == 1)  // Special case for 1 philosopher
   {
     philosopher_think(philo);
@@ -66,6 +74,13 @@ void routine(t_philo *philo, sem_t *forks, sem_t *print_block)
     usleep(500);
 	while(1)
 	{
+    sem_wait(philo->table->death_sem);
+    if (philo->table->death_flag == 1)
+    {
+      sem_post(philo->table->death_sem);
+      break;
+    }
+    sem_post(philo->table->death_sem);
     int stop = 0;
     sem_wait(philo->table->death_sem);
     if (philo->table->philos_full == 1 || philo->table->death_flag == 1)
@@ -75,11 +90,25 @@ void routine(t_philo *philo, sem_t *forks, sem_t *print_block)
       break;
     philosopher_think(philo);
     sem_wait(forks);
-		philosopher_took_fork(philo);
-		sem_wait(forks);
-   
     sem_wait(philo->table->death_sem);
-		philosopher_took_fork(philo);
+    if (philo->table->death_flag == 1)
+    {
+      sem_post(philo->table->death_sem);
+      break;
+    }
+    sem_post(philo->table->death_sem);
+    philosopher_took_fork(philo);
+		sem_wait(forks);
+    
+    sem_wait(philo->table->death_sem);
+    if (philo->table->death_flag == 1)
+    {
+      sem_post(philo->table->death_sem);
+      break;
+    }
+    sem_post(philo->table->death_sem);
+    sem_wait(philo->table->death_sem);
+    philosopher_took_fork(philo);
     philo->last_meal = time_to_ms();
     philo->meals_eaten+=1;
     sem_post(philo->table->death_sem);
@@ -87,9 +116,17 @@ void routine(t_philo *philo, sem_t *forks, sem_t *print_block)
     
     philosopher_eat(philo);
     
-    sem_post(forks);
-		sem_post(forks);
-		philosopher_sleep(philo);
+  sem_post(forks);
+	sem_post(forks);
+
+  sem_wait(philo->table->death_sem);
+    if (philo->table->death_flag == 1)
+    {
+      sem_post(philo->table->death_sem);
+      break;
+    }
+    sem_post(philo->table->death_sem);
+    philosopher_sleep(philo);
 		usleep(100);
 	}
   pthread_join(philo->monitor,&status);

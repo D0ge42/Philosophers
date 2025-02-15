@@ -56,6 +56,8 @@ typedef struct s_philo
   sem_t       *sem_meal;
   sem_t       *death_sem;
 	pthread_t			monitor;
+  void        *free_forks;
+  void        *free_printblock;
 	int					pid;
 	sem_t				*print_block;
 }						t_philo;
