@@ -91,7 +91,7 @@ void	init_processes(t_philo *philos, t_table *table, sem_t *forks, sem_t *print_
 		if ((philos[i].pid) == -1)
 			return ;
 		else if ((philos[i].pid) == 0)
-			routine(&philos[i], forks, print_block);
+			monitor(&philos[i], forks, print_block);
 		i++;
 	}
 	wait_pid_and_exit(philos, table);

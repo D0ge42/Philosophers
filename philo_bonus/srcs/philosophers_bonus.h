@@ -56,8 +56,8 @@ typedef struct s_philo
   sem_t       *sem_meal;
   sem_t       *death_sem;
 	pthread_t			monitor;
-  void        *free_forks;
-  void        *free_printblock;
+  sem_t        *forks;
+  sem_t        *printblock;
 	int					pid;
 	sem_t				*print_block;
 }						t_philo;
@@ -82,7 +82,8 @@ int						safe_print(t_philo *philo, char *to_print);
 int						is_input_valid(int ac, char **av);
 int						ft_strcmp(char *s1, char *s2);
 
-void routine(t_philo *philo, sem_t *forks, sem_t *print_block);
+void monitor(t_philo *philo, sem_t *forks, sem_t *print_block);
+void *routine(void *ptr);
 void philosopher_eat(t_philo *philo);
 void philosopher_think(t_philo *philo);
 void philosopher_sleep(t_philo *philo);
