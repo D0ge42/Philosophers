@@ -62,7 +62,7 @@ int	check_death(time_t last_meal_time, t_philo *philos)
 	{
 		philos->table->death_flag = 1;
 		// printf("%li %i has died\n", current_time - philos->table->start_time,
-		// 	philos->id);
+			// philos->id);
 		return (1);
 	}
 	return (0);

@@ -34,7 +34,6 @@ void	create_philos(char **av, t_philo *philos)
 		philos[i].semaphore = sem_open(philos[i].sem_name, O_CREAT | O_EXCL,
 				0644, 0);
     philos[i].sem_meal = sem_open(philos[i].sem_meal_name, O_CREAT | O_EXCL, 0644, 1);
-		philos[i].print_block = sem_open("/printblock", O_CREAT, 0644, 1);
 		i++;
 	}
 }

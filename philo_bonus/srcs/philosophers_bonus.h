@@ -80,7 +80,7 @@ int						safe_print(t_philo *philo, char *to_print);
 int						is_input_valid(int ac, char **av);
 int						ft_strcmp(char *s1, char *s2);
 
-void routine(t_philo *philo, sem_t *forks);
+void routine(t_philo *philo, sem_t *forks, sem_t *print_block);
 void philosopher_eat(t_philo *philo);
 void philosopher_think(t_philo *philo);
 void philosopher_sleep(t_philo *philo);
