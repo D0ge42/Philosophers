@@ -87,7 +87,6 @@ void monitor(t_philo *philo, sem_t *forks, sem_t *print_block)
       break;
     }
 	}
- pthread_join(philo->monitor, NULL);
 }
 
 void routine_sem_unlink(t_philo *philo, sem_t *forks, sem_t *print_block)
