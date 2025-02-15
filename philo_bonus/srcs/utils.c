@@ -16,41 +16,6 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-static void	parse_input_string(t_philo *philo, char *to_print);
-
-int	safe_print(t_philo *philo, char *to_print)
-{
-	if (philo->table->death_flag == 0)
-	{
-		parse_input_string(philo, to_print);
-		return (0);
-	}
-	else
-		return (1);
-}
-
-/*Custom time to sleep function. This is useful to let the philosophers
- * sleep for a certain amount of time, specified in the main args.*/
-
-static void	parse_input_string(t_philo *philo, char *to_print)
-{
-	if (ft_strcmp(to_print, "is thinking") == 0)
-		printf("%li %i %s%s%s\n", time_to_ms() - philo->table->start_time,
-			philo->id, CYAN, to_print, RESET);
-	else if (ft_strcmp(to_print, "is eating") == 0)
-		printf("%li %i %s%s%s\n", time_to_ms() - philo->table->start_time,
-			philo->id, GREEN, to_print, RESET);
-	else if (ft_strcmp(to_print, "is sleeping") == 0)
-		printf("%li %i %s%s%s\n", time_to_ms() - philo->table->start_time,
-			philo->id, BLUE, to_print, RESET);
-	else if (ft_strcmp(to_print, "has taken a fork") == 0)
-		printf("%li %i %s%s%s\n", time_to_ms() - philo->table->start_time,
-			philo->id, YELLOW, to_print, RESET);
-	else
-		printf("%li %i %s\n", time_to_ms() - philo->table->start_time,
-			philo->id, to_print);
-}
-
 int	check_death(time_t last_meal_time, t_philo *philos)
 {
 	time_t	current_time;
@@ -61,8 +26,6 @@ int	check_death(time_t last_meal_time, t_philo *philos)
 	if (time_since_last_meal >= philos->table->time_to_die)
 	{
 		philos->table->death_flag = 1;
-		// printf("%li %i has died\n", current_time - philos->table->start_time,
-		// philos->id);
 		return (1);
 	}
 	return (0);

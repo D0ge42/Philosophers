@@ -71,7 +71,7 @@ typedef struct s_table
 	time_t				time_to_die;
 	time_t				time_to_eat;
 	time_t				time_to_sleep;
-  int           everyone_ate;
+	int					everyone_ate;
 }						t_table;
 
 int						safe_print(t_philo *philo, char *to_print);

@@ -105,7 +105,7 @@ void	wait_pid_and_exit(t_philo *philo, t_table *table)
 		waitpid(-1, &status, 0);
 		if (status)
 		{
-			philo_id = (((status)&0xff00) >> 8);
+			philo_id = (((status) & 0xff00) >> 8);
 			i = 0;
 			school_shooting(philo);
 			printf("%li %i has died\n", time_to_ms() - table->start_time,
