@@ -126,5 +126,5 @@ void school_shooting(t_philo *philo)
 	{
 				kill(philo[i].pid, SIGKILL);
         i++;
-			}
+	}
 }

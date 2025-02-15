@@ -57,20 +57,21 @@ void monitor(t_philo *philo, sem_t *forks, sem_t *print_block)
 {
   philo->print_block = print_block;
   philo->forks = forks;
-	if (pthread_create(&philo->monitor,NULL, &routine, philo))
+  if (pthread_create(&philo->monitor,NULL, &routine, philo))
 	{
 		printf("failed to create thread\n");
     routine_sem_unlink(philo, forks,print_block);
 		exit(0);
 	}
+  pthread_detach(philo->monitor);
   while(1)
   {
     sem_wait(philo->table->death_sem);
-    int death = check_death(philo->last_meal, philo);
+    int death = time_to_ms() - philo->last_meal;
     sem_post(philo->table->death_sem);
-    if (death)
+    if (death >= philo->table->time_to_die)
     {
-      pthread_detach(philo->monitor);
+      philo->table->death_flag = 1;
       routine_sem_unlink(philo, forks, print_block);
       exit(philo->id);
     }
@@ -80,13 +81,13 @@ void monitor(t_philo *philo, sem_t *forks, sem_t *print_block)
 
     if (meals_eaten >= philo->table->meals_to_eat)
     {
-      pthread_detach(philo->monitor);
       sem_wait(philo->table->death_sem);
       philo->table->philos_full = 1;
       sem_post(philo->table->death_sem);
       break;
     }
 	}
+ pthread_join(philo->monitor, NULL);
 }
 
 void routine_sem_unlink(t_philo *philo, sem_t *forks, sem_t *print_block)
