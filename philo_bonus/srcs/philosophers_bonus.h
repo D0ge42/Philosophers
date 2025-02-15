@@ -51,7 +51,9 @@ typedef struct s_philo
 	t_table				*table;
 	int					is_thinking;
 	char 				sem_name[50];
+	char 				sem_meal_name[50];
 	sem_t				*semaphore;
+  sem_t       *sem_meal;
   sem_t       *death_sem;
 	pthread_t			monitor;
 	int					pid;
@@ -67,6 +69,7 @@ typedef struct s_table
 	unsigned int		meals_to_eat;
 	int					*forks;
 	int					death_flag;
+  sem_t         *death_sem;
 	time_t				start_time;
 	time_t				time_to_die;
 	time_t				time_to_eat;

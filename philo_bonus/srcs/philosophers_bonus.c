@@ -50,6 +50,7 @@ int	main(int ac, char **av)
 	unlink_sems(philos, &table);
 	init_processes(philos, &table, forks);
 	sem_close(forks);
+  sem_close(table.death_sem);
 }
 
 void	unlink_sems(t_philo *philos, t_table *table)
@@ -59,13 +60,14 @@ void	unlink_sems(t_philo *philos, t_table *table)
 	i = 0;
 	sem_unlink(FORKS);
 	sem_unlink("/printblock");
-	// sem_unlink("/death_sem");
+  sem_unlink("/death_sem");
 	while (i < table->num_of_philos)
 	{
-		// sem_close(philos[i].death_sem);
+    sem_close(philos[i].sem_meal);
 		sem_close(philos[i].print_block);
 		sem_close(philos[i].semaphore);
 		sem_unlink(philos[i].sem_name);
+		sem_unlink(philos[i].sem_meal_name);
 		i++;
 	}
 }
@@ -103,7 +105,7 @@ void	wait_pid_and_exit(t_philo *philo, t_table *table)
 	while (i < table->num_of_philos)
 	{
 		waitpid(-1, &status, 0);
-		if (status)
+    if (status)
 		{
 			philo_id = WEXITSTATUS(status);
 			i = 0;
