@@ -63,3 +63,10 @@ int	ft_strcmp(char *s1, char *s2)
 	}
 	return (*s1 - *s2);
 }
+
+void	routine_sem_unlink(t_philo *philo, sem_t *forks, sem_t *print_block)
+{
+	sem_close(forks);
+	sem_close(philo->table->death_sem);
+	sem_close(print_block);
+}

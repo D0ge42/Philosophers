@@ -6,7 +6,7 @@
 /*   By: lonulli <lonulli@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 10:21:32 by lonulli           #+#    #+#             */
-/*   Updated: 2025/02/12 15:18:02 by lonulli          ###   ########.fr       */
+/*   Updated: 2025/02/17 11:04:50 by lonulli          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,23 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <unistd.h>
 
-pid_t	**create_processes(pid_t **processes, int num_philos);
 void	init_processes(t_philo *philos, t_table *table, sem_t *forks,
 			sem_t *print_block);
 void	unlink_sems(t_philo *philos, t_table *table);
-// int check_philos_health(t_philo **philos, t_table *table);
 void	wait_pid_and_exit(t_philo *philo, t_table *table);
-void	free_everything(t_philo **philo, t_table *table, pid_t **processes);
-void	free_processes(pid_t **processes, t_table *table);
 void	school_shooting(t_philo *philo);
+
+/*Main process.
+ * Basically everything was made without the use of malloc to prevent
+ * leaks, since we'll be dealing with both processed and threads.
+ * Everything get initialized in both create_philo and table initializer.
+ * 2 global semaphores are created.
+ * One is gonna be responsible for forks. The other for the prints.
+ * Init process will fork the main process into sub processes (philos.)
+ * Inside each process there we'll find (main thread) and a subthread (routine)
+ * Monitor will check for philos health. */
 
 int	main(int ac, char **av)
 {
@@ -42,14 +47,18 @@ int	main(int ac, char **av)
 	create_philos(av, philos);
 	create_table(av, ac, &table);
 	table_initializer(&table, av, ac);
+	unlink_sems(philos, &table);
+	if (table.meals_to_eat == 0)
+		return (0);
 	forks = sem_open(FORKS, O_CREAT, 0644, table.num_of_philos);
 	print_block = sem_open("/printblock", O_CREAT, 0644, table.num_of_philos);
-	unlink_sems(philos, &table);
 	init_processes(philos, &table, forks, print_block);
 	sem_close(forks);
 	sem_close(print_block);
 	sem_close(table.death_sem);
 }
+
+/*Since semaphores are created as files, we've to unlink them.*/
 
 void	unlink_sems(t_philo *philos, t_table *table)
 {
@@ -93,6 +102,14 @@ void	init_processes(t_philo *philos, t_table *table, sem_t *forks,
 	wait_pid_and_exit(philos, table);
 }
 
+/*Waitpid will basically wait for every process to end when set with -1.
+ * That means that the execution of the main process
+ will stop until each child
+ * hasn't finished (or died/reached num of meals).
+ * When a child dies we exit the process and return its ID as status.
+ * We''ll then be able to retrieve the PHILO ID
+ by applying a mask to the exit status.*/
+
 void	wait_pid_and_exit(t_philo *philo, t_table *table)
 {
 	int	i;
@@ -115,6 +132,8 @@ void	wait_pid_and_exit(t_philo *philo, t_table *table)
 		i++;
 	}
 }
+
+/*Function to kill each child (process)*/
 
 void	school_shooting(t_philo *philo)
 {
